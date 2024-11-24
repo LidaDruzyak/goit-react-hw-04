@@ -6,4 +6,3 @@ export const fetchImages = async (query, page) => {
   );
   return response.data;
 };
-// return response.data.results;

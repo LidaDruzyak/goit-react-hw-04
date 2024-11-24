@@ -7,6 +7,7 @@ import ErrorMessage from "./ErrorMessage/ErrorMessage";
 import SearchBar from "./SearchBar/SearchBar";
 import LoadMoreBtn from "./LoadMoreBtn/LoadMoreBtn";
 import toast from "react-hot-toast";
+import ImageModal from "./ImageModal/ImageModal";
 
 const App = () => {
   const [images, setImages] = useState([]);
@@ -15,10 +16,13 @@ const App = () => {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     const getData = async () => {
       if (!query) return;
+
       try {
         setIsLoading(true);
         setIsError(false);
@@ -32,6 +36,7 @@ const App = () => {
         setIsLoading(false);
       }
     };
+
     getData();
   }, [query, page]);
 
@@ -42,15 +47,32 @@ const App = () => {
     setTotalPages(0);
   };
 
+  const openModal = (image) => {
+    if (!isOpen) {
+      setIsOpen(true);
+      setSelectedImage(image);
+    }
+  };
+
+  const closeModal = () => {
+    setIsOpen(false);
+    setSelectedImage(null);
+  };
+
   return (
     <div>
       <SearchBar onChangeQuery={handleChangeQuery} />
       {isLoading && <Loader />}
-      <ImageGallery images={images} />
+      <ImageGallery images={images} onImageClick={openModal} />
       {isError && <ErrorMessage />}
       {images.length > 0 && page < totalPages && (
         <LoadMoreBtn onClick={() => setPage((prev) => prev + 1)} />
       )}
+      <ImageModal
+        isOpen={isOpen}
+        image={selectedImage}
+        onRequestClose={closeModal}
+      />
     </div>
   );
 };
